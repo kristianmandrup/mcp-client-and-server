@@ -93,13 +93,36 @@ export default function AIAssistant() {
   const isOpen = useStore(showAIAssistant);
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     initialMessages: [],
-    fetch: (_url, options) => {
-      const { messages } = JSON.parse(options!.body! as string);
-      return genAIResponse({
-        data: {
-          messages,
-        },
-      });
+    async fetch(_url, options) {
+      try {
+        const { messages } = JSON.parse(options!.body! as string);
+
+        // Call the server function directly
+        const response = await genAIResponse({
+          data: { messages },
+        });
+
+        // Convert the response to what useChat expects
+        if (response instanceof Response) {
+          return response;
+        } else {
+          // Handle error case
+          return new Response(
+            JSON.stringify({
+              error: (response as any).error || "Unknown error",
+            }),
+            { status: 500 }
+          );
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        return new Response(
+          JSON.stringify({
+            error: "Failed to communicate with AI server",
+          }),
+          { status: 500 }
+        );
+      }
     },
     onToolCall: (call) => {
       if (call.toolCall.toolName === "recommendGuitar") {

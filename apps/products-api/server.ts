@@ -20,6 +20,11 @@ app.get("/products", (req, res) => {
   );
 });
 
+// Health check endpoint
+app.get("/health", (_, res) => {
+  res.sendStatus(200);
+});
+
 app.listen(PORT, () => {
   console.log(
     `Products API Server is running on port http://localhost:${PORT}`

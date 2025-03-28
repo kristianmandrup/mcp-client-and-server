@@ -24,6 +24,7 @@ export interface Order {
 }
 
 export const fetchGuitars = async () => {
+  console.log("Fetching guitars...");
   const response = await fetch("http://localhost:8082/products");
   if (!response.ok) {
     throw new Error("Network response was not ok");
